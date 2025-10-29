@@ -1,61 +1,192 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Galvez MidTerms — Laravel CRUD for Students and Sections
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a Laravel application that manages Students and Sections with full CRUD interfaces. It uses Blade views, Eloquent models, and RESTful resource controllers. A SQLite database is included for quick local setup on Windows.
 
-## About Laravel
+### Key Features
+- Students CRUD: list, create, view, edit, delete
+- Sections CRUD with validation: unique `sectionCode`, required `sectionName`, integer `capacity`
+- Blade views under `resources/views/students` and `resources/views/sections`
+- Resource routes (`/students`, `/sections`) registered in `routes/web.php`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Prerequisites (Windows)
+- PHP 8.2+
+- Composer
+- Node.js 18+ and npm (for Vite assets; optional if you use prebuilt CSS/JS)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Verify versions:
 
-## Learning Laravel
+```bash
+php -v
+composer -V
+node -v && npm -v
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Quick Start
+1) Install PHP dependencies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2) Create environment file
 
-## Laravel Sponsors
+```bash
+copy .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3) Database configuration
+- Default is SQLite. A database file exists at `database/database.sqlite`.
+- Ensure your `.env` contains:
 
-### Premium Partners
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=./database/database.sqlite
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4) Run migrations
 
-## Contributing
+```bash
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5) (Optional) Build frontend assets with Vite
 
-## Code of Conduct
+```bash
+npm install
+npm run build    # or: npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6) Serve the app
 
-## Security Vulnerabilities
+```bash
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Open `http://127.0.0.1:8000` in your browser.
+
+## Application Structure (relevant parts)
+- `app/Models/Student.php` — mass-assignable fields: `studentNumber`, `lname`, `fname`, `mi`, `email`, `contactNumber`
+- `app/Models/Section.php` — mass-assignable fields: `sectionCode`, `sectionName`, `description`, `room`, `capacity`
+- `app/Http/Controllers/StudentController.php` — resource controller for Students
+- `app/Http/Controllers/SectionController.php` — resource controller for Sections with request validation
+- `resources/views/students/*` — Blade views for Students CRUD
+- `resources/views/sections/*` — Blade views for Sections CRUD
+- `routes/web.php` — route definitions
+
+## Routes
+Registered in `routes/web.php`:
+
+```php
+Route::get('/', [StudentController::class, 'index'])->name('students.index');
+Route::resource('students', StudentController::class);
+Route::resource('sections', SectionController::class);
+```
+
+This generates the following endpoints:
+
+- Students
+  - GET `/students` (index)
+  - GET `/students/create` (create)
+  - POST `/students` (store)
+  - GET `/students/{student}` (show)
+  - GET `/students/{student}/edit` (edit)
+  - PUT/PATCH `/students/{student}` (update)
+  - DELETE `/students/{student}` (destroy)
+
+- Sections
+  - GET `/sections` (index)
+  - GET `/sections/create` (create)
+  - POST `/sections` (store)
+  - GET `/sections/{section}` (show)
+  - GET `/sections/{section}/edit` (edit)
+  - PUT/PATCH `/sections/{section}` (update)
+  - DELETE `/sections/{section}` (destroy)
+
+## Validation (Sections)
+Create/Update requests validate:
+
+```php
+[
+  'sectionCode' => 'required|unique:sections,sectionCode[,ignoreId]',
+  'sectionName' => 'required',
+  'description' => 'nullable',
+  'room' => 'nullable',
+  'capacity' => 'required|integer|min:1',
+]
+```
+
+## Database
+Migrations are located in `database/migrations`, including tables for users, jobs/cache (framework defaults), and domain entities:
+- `2025_09_05_152536_create_students_table.php`
+- `2025_09_13_083649_create_sections_table.php`
+
+To reset the database:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Seed sample data
+This project includes basic seed data for one `User`, two `Sections`, and two `Students` via `database/seeders/DatabaseSeeder.php`.
+
+Run:
+
+```bash
+php artisan db:seed
+```
+
+## Frontend Assets
+- Source files: `resources/css/app.css`, `resources/js/app.js`
+- Build/serve with Vite: `npm run dev` (hot reload) or `npm run build`
+- Public assets (already built or static): `public/css`, `public/js`
+
+## Screenshots
+Add screenshots or GIFs to visually demo the flows. Suggested locations:
+
+```
+public/screenshots/students-index.png
+public/screenshots/students-create.png
+public/screenshots/sections-index.png
+```
+
+Embed in this README, for example:
+
+```md
+![Students Index](public/screenshots/students-index.png)
+```
+
+## Running Tests
+
+```bash
+php artisan test
+```
+
+## Troubleshooting
+- White page or view errors: run `php artisan view:clear && php artisan cache:clear`
+- SQLite permission issues: ensure `database/database.sqlite` exists and is writable
+- Class not found or autoload issues: run `composer dump-autoload`
+- Asset 404s: run `npm run dev` and keep Vite running, or `npm run build` for production assets
+
+## Notes
+- There is a secondary Laravel project under `Galvez_Novelozo_Collab/`. This README documents the root app. If you intend to run the collaborative app, refer to its own `README.md` and run commands from that subdirectory.
+
+### Running the collaborative sub-app (`Galvez_Novelozo_Collab/`)
+
+From `Galvez_Novelozo_Collab/`:
+
+```bash
+cd Galvez_Novelozo_Collab
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run dev   # optional for assets
+php artisan serve
+```
 
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT
